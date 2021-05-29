@@ -1,0 +1,69 @@
+<% provide(:title, 'スタッフ一覧') %>
+<h1>スタッフ一覧</h1>
+<div class="col-md-6 col-md-offset-3 csv">
+  <%= form_with(url: csv_path, local: true) do |f| %>
+  <%= f.date_select(
+          :worked_on,
+          start_year: Date.current.year - 10,
+          end_year: Date.current.year,
+          default: {year: Date.current.year, month: Date.current.month, day: 1},
+          discard_day: true
+          )
+          %>
+  <%= f.submit "勤怠集計データCSV出力", class: "btn btn-warning" , data: { disable_with: '出力中' } %>
+  <% end %>
+</div>
+
+<div class="col-md-10 col-md-offset-1">
+  <div class="center">
+    <%= will_paginate %>
+  </div>
+
+  <form class="form-inline">
+    <%= form_with url:users_path, method: :get, local: true  do |form| %>
+    <%= form.text_field :search, placeholder: "店舗別検索", class: "form-control", value: params[:search] %>
+    <%= form.submit '検索', class: 'btn btn-primary' %>
+  </form>
+
+  <table class="table table-condensed table-hover" id="table-users">
+    <thead>
+      <tr>
+        <th><%= User.human_attribute_name :emp_id %></th>
+        <th><%= User.human_attribute_name :name %></th>
+        <th class="center"><%= User.human_attribute_name :department %></th>
+        <th class="center"><%= User.human_attribute_name :position %></th>
+        <th class="center"><%= User.human_attribute_name :hour_pay %>(パートナー)</th>
+        <th class="center"><%= User.human_attribute_name :bikou %></th>
+      </tr>
+    </thead>
+
+    <% @users.each do |user| %>
+    <tr>
+      <td><%= format("%04d", user.emp_id) %></td>
+      <td><%= link_to user.name, user %></td>
+      <td class="center"><%= user.department.present? ? user.department : "未入力" %></td>
+      <td class="center"><%= user.position %></td>
+      <td class="center">
+        <%= user.hour_pay %>
+        <% if user.hour_pay.present? %>
+        円
+        <% end %>
+      </td>
+      <td class="center"><%= user.bikou %></td>
+      <td class="center">
+        <% if current_user.admin? && !current_user?(user) %>
+        <%= link_to "重要情報更新", edit_user_path(user), class: "btn btn-success" %>
+        <%= link_to "情報編集", edit_basic_info_user_path(user), remote: true, class: "btn btn-success" %>
+        <%= link_to "削除", user, method: :delete, data: { confirm: "削除してよろしいですか？" }, class: "btn btn-danger" %>
+        <% end %>
+      </td>
+    </tr>
+    <% end %>
+  </table>
+  <% end %>
+  <div class="center">
+    <%= will_paginate %>
+  </div>
+</div>
+<!--モーダルウインドウ表示-->
+<div id="edit-basic-info" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

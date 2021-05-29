@@ -1,0 +1,20 @@
+<% provide(:title, "login") %>
+<h1>ログイン</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <%= form_with(scope: :session, url: login_path, local: true) do |f| %>
+
+      <!--%= f.label :email, "メールアドレス", class: "label-login" %>-->
+      <!--%= f.email_field :email, class: 'form-control' %>-->
+      
+       <%= f.label :emp_id, "社員コード", class: "label-login" %>
+      <%= f.number_field :emp_id, class: 'form-control' %>
+
+      <%= f.label :password, "パスワード", class: "label-login" %>
+      <%= f.password_field :password, class: 'form-control' %>
+
+      <%= f.submit "ログイン", class: "btn btn-primary btn-block btn-login" , data: { disable_with: 'ログイン処理中' }%>
+    <% end %>
+  </div>
+</div>

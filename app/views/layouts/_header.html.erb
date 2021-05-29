@@ -1,0 +1,45 @@
+<header class="navbar navbar-fixed-top bg-gradient">
+  <div class="container">
+    <% if logged_in? %>
+    <%  if current_user.admin? %>
+    <%= link_to "spread勤怠管理", users_path, id: "logo" %>
+    <% else %>
+    <%= link_to "spread勤怠管理", current_user, id: "logo" %>
+    <% end %>
+    <% else %>
+    <%= link_to "spread勤怠管理", root_path, id: "logo" %>
+    <% end %>
+    <nav>
+      <ul class="nav navbar-nav navbar-right">
+        <% if logged_in? %>
+        <%  if current_user.admin? %>
+        <li><%= link_to "トップへ", users_path %></li>
+        <% else %>
+        <li><%= link_to "トップへ", current_user %></li>
+        <% end %>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            メニュー <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+            <% if current_user.admin? %>
+            <li><%= link_to "スタッフ登録", signup_path %></li>
+            <li><%= link_to "管理者情報の設定", edit_user_path(current_user) %></li>
+            <li class="divider"></li>
+            <li><%= link_to "勤怠", current_user %></li>
+            <li><%= link_to "ログアウト", logout_path, method: :delete %></li>
+            <% else %>
+            <li><%= link_to "勤怠", current_user %></li>
+            <li class="divider"></li>
+            <li><%= link_to "ログアウト", logout_path, method: :delete %></li>
+            <% end %>
+          </ul>
+        </li>
+        <% else %>
+        <li><%= link_to "トップへ", root_path %></li>
+        <li><%= link_to "ログイン", login_path %></li>
+        <% end %>
+      </ul>
+    </nav>
+  </div>
+</header>

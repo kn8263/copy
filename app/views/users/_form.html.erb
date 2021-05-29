@@ -1,0 +1,23 @@
+<%= form_with(model: @user, local: true) do |f| %>
+  <%= render 'shared/error_messages', object: @user %>
+
+  <%= f.label :name, class: "label-#{yield(:class_text)}" %>
+  <%= f.text_field :name, class: "form-control" %>
+
+  <%= f.label :email, class: "label-#{yield(:class_text)}" %>
+  <%= f.email_field :email, class: "form-control", placeholder: "無くても仮で入れてください 例：" + "社員コード+"+ "@email.com" %>
+  
+  <%= f.label :emp_id, class: "label-#{yield(:class_text)}" %>
+  <%= f.number_field :emp_id, class: 'form-control' %>
+
+  <%= f.label :department, class: "label-#{yield(:class_text)}" %>
+  <%= f.text_field :department, class: "form-control" %>
+
+  <%= f.label :password, class: "label-#{yield(:class_text)}" %>
+  <%= f.password_field :password, class: "form-control" %>
+
+  <%= f.label :password_confirmation, class: "label-#{yield(:class_text)}" %>
+  <%= f.password_field :password_confirmation, class: "form-control" %>
+
+  <%= f.submit yield(:button_text), class: "btn btn-primary btn-block btn-#{yield(:class_text)}" , data: { disable_with: '処理中' }%>
+<% end %>

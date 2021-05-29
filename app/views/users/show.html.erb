@@ -1,0 +1,105 @@
+<% provide(:title, @user.name) %>
+<div>
+  <table class="table table-bordered table-condensed user-table">
+    <tr>
+      <div class="btn-users-show">
+        <td>
+          <%= link_to "←", user_path(date: @first_day.prev_month), class: "btn btn-default" %>
+          <%= l(@first_day, format: :middle) %>
+          <% if current_user.admin? %>
+          <%= link_to "勤怠管理表", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-default" %>
+          <% end %>
+          <%= link_to "→", user_path(date: @first_day.next_month), class: "btn btn-default" %> </br>
+        </td>
+        <td>氏名 </br><%= @user.name %></td>
+        <td>所属 </br><%= @user.department.present? ? @user.department : "未記入" %></td>
+        <td>備考 </br><%= @user.bikou %></td>
+    </tr>
+  </table>
+
+  <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+    <thead>
+      <tr>
+        <th>日付</th>
+        <th>曜日</th>
+        <th>勤怠</th>
+        <th>出勤</th>
+        <th>休入</th>
+        <th>休戻</th>
+        <th>退勤</th>
+        <th>勤務時間</th>
+        <th>残業時間</th>
+        <th>22時以降</th>
+        <th>お知らせ</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @attendances.each do |day| %>
+      <tr>
+        <td><%= l(day.worked_on, format: :short) %></td>
+        <td class='<%= "wday#{day.worked_on.wday}"%>'> <%= $days_of_the_week[day.worked_on.wday] %></td>
+
+        <% if day.started_at.present? && day.finished_at.nil? && day.rest_in_at.nil? && day.worked_on == Date.current.yesterday %>
+        <td><%= link_to "深夜休憩IN", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary btn-attendance" , data: { disable_with: '処理中' }%></td>
+        <% elsif day.started_at.present? && day.finished_at.nil? && day.rest_in_at.present? && day.rest_out_at.nil? && day.worked_on == Date.current.yesterday %>
+        <td><%= link_to "深夜休憩OUT", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary btn-attendance" , data: { disable_with: '処理中' }%></td>
+        <% elsif day.started_at.present? && day.finished_at.nil? && day.rest_in_at.present? && day.rest_out_at.present? && day.worked_on == Date.current.yesterday %>
+        <td><%= link_to "深夜退勤", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary btn-attendance" , data: { disable_with: '処理中' }%></td>
+        <% else %>
+        <td>
+          <% if btn_text = attendance_state(day) %>
+          <%= link_to "#{btn_text}", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary btn-attendance" , data: { disable_with: '処理中' } %>
+          <% end %>
+        </td>
+        <% end %>
+
+        <td><%= l(day.started_at, format: :time) if day.started_at.present? %></td>
+        <td><%= l(day.rest_in_at, format: :time) if day.rest_in_at.present? %></td>
+        <td><%= l(day.rest_out_at, format: :time) if day.rest_out_at.present? %></td>
+        <td><%= l(day.finished_at, format: :time) if day.finished_at.present? %></td>
+        <td id="total-working">
+          <%= format("%.2f", day.day_total_working.to_f) %>
+          <% @total_working_times = @total_working_times.to_f + day.day_total_working.to_f %>
+        </td>
+        <td>
+          <%= format("%.2f", day.day_over_working.to_f) %>
+          <% @total_zangyo_times = @total_zangyo_times.to_f + day.day_over_working.to_f %>
+        </td>
+        <td>
+          <%= format("%.2f", day.day_night_working.to_f) %>
+          <% @total_night_works = @total_night_works.to_f + day.day_night_working.to_f %>
+        </td>
+        <td><%= day.note %></td>
+      </tr>
+      <% end %>
+    </tbody>
+
+    <tfoot>
+      <!--rowspan:縦結合、colspan：横結合-->
+      <tr>
+        <th colspan="14">合計</th>
+      </tr>
+      <tr>
+        <th colspan="3">出勤日数</th>
+        <th colspan="3">総勤務時間</th>
+        <td colspan="3">残業時間</td>
+        <td colspan="3">22時以降勤務時間</td>
+
+      </tr>
+      <% @total_working_times_h = @total_working_times.truncate %>
+      <% @total_working_times_m = ((@total_working_times - @total_working_times_h) * 60 ).round %>
+      <% @total_zangyo_times_h = @total_zangyo_times.truncate %>
+      <% @total_zangyo_times_m = ((@total_zangyo_times - @total_zangyo_times_h) * 60 ).round %>
+      <% @total_night_works_h = @total_night_works.truncate %>
+      <% @total_night_works_m = ((@total_night_works - @total_night_works_h) * 60 ).round %>
+      <tr>
+        <th colspan="3"><%= @worked_sum %>日</th>
+        <!--<th colspan="3">%= format("%.2f", @total_working_times.to_f) %> 時間</th>-->
+        <th colspan="3"><%= @total_working_times_h %> 時間 <%= @total_working_times_m %> 分</th>
+        <td colspan="3"><%= @total_zangyo_times_h %> 時間 <%= @total_zangyo_times_m %> 分</td>
+        <td colspan="3"><%= @total_night_works_h %> 時間 <%= @total_night_works_m %> 分</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
