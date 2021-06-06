@@ -34,35 +34,52 @@
 - リファクタリング
 - 勤務時間の細分化計算ロジックを組む
 ```
+<br>
 
 ### 開発環境
 
 ```
+エディタ
+- VSCode
+
 言語
-- Ruby 2.6.3
-- JavaScript
+- Ruby 2.6.6
+- JavaScript ES5
 
 フレームワーク
 - Ruby on Rails 5.1.7
 
 データベース
-- PostgreSQL
+- SQLite3 1.3.13
 
 git 2.30.1
 bundler 1.17.2
 ```
 
+<br>
+
+### 本番環境
+```
+●heroku
+
+Ruby 2.6.6
+Ruby on Rails 5.1.7
+PostgreSQL 13.2
+```
+
+<br>
 ### 初期データ
 
 ```
 管理者
     社員コード 999
-    パスワード password
 一般
     社員コード 1001,1002,1003,1004,9001
-    パスワード password（一律）
+共通
+    パスワード password
 ```
 
+<br>
 ### リンク
 
 [spread勤怠管理システムサンプル](https://copy-attendance-system.herokuapp.com/ "copy")
